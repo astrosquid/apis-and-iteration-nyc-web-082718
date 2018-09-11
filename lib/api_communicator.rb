@@ -1,6 +1,7 @@
 require 'rest-client'
 require 'json'
 require 'pry'
+require 'colorize'
 
 # A user will run the program, see a lovely welcome message of your choosing, and then be prompted to enter the name of a character.
 
@@ -54,16 +55,22 @@ def print_movies(films_array, input_character_name)
   # binding.pry
   pid = fork{ exec 'afplay', './lib/starwars.mp3' }
   films_array.each do |film|
+    # binding.pry
     puts ''
     puts '-+-'
-    puts film['title'].upcase
+    puts "EPISODE #{film['episode_id']}: #{film['title'].upcase}".yellow
+    # binding.pry
+    film['opening_crawl'].split(/\r\n/).each do |line|
+      puts "  #{line}".yellow
+      sleep(0.3)
+    end
     puts "Director: #{film['director']}"
     puts "Starring #{input_character_name.split(' ').map { |n| n.capitalize}.join(' ') }"
     puts "Also starring: "
     film['characters'].each do |char_url|
       other_char_info = JSON.parse(RestClient.get(char_url))
       unless other_char_info['name'].downcase == input_character_name
-        puts "  #{other_char_info['name']}"
+        print "   #{other_char_info['name']}"
       end
     end
   end
